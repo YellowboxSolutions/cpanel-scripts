@@ -1,10 +1,12 @@
 #!/bin/bash
 
 user=${1// }
-if [[ -z $user ]]; then
-  echo "wrong params"
-  echo "hacksearch.sh user"
-  exit 0
+if [[ -z $user ]]
+then
+	user=$(stat . -c %U)
+	trust=false
+else
+	trust=true
 fi
 
 
@@ -55,12 +57,27 @@ crontab -u $user -l
 echo "."
 
 echo "Checking wordpress users"
-sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html user list 2>/dev/null
+if [ "$trust" = true ]
+then
+	sudo -u $user -- /usr/local/bin/php /usr/bin/wp ---path=/home/$user/public_htmll user list 2>/dev/null
+else
+	/usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html user list
+fi
 echo "."
 
 echo "Checking wordpress checksums"
 echo "* core"
-sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html core verify-checksums 2>/dev/null
+if [ "$trust" = true ]
+then
+	sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html core verify-checksums 2>/dev/null
+else
+	/usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html core verify-checksums
+fi
 echo "* plugins"
-sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html plugin verify-checksums --all 2>/dev/null
+if [ "$trust" = true ]
+then
+	sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html plugin verify-checksums --all 2>/dev/null
+else
+	/usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html core verify-checksums
+fi
 echo "."
