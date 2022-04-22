@@ -6,11 +6,12 @@
 # 1123 example2.com
 # 123 example3.com
 
-for i in `find /etc/apache2/logs/domlogs -maxdepth 1 -type f|egrep -v 'offset|_log$'`
+for i in `find /etc/apache2/logs/domlogs -maxdepth 1 -type f|egrep -v 'offset|_log$|proxy'`
 do
         awk '{print $4}' $i|
         cut -d: -f1|
+	cut -d[ -f2|
         uniq -c|
         sort -n|
-        awk '{print $1 " '`echo $i|cut -d/ -f6`'"}'
+        awk '{print $1, $2 " '`echo $i|cut -d/ -f6`'"}'
 done|sort -nr
