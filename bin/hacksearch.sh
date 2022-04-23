@@ -3,10 +3,9 @@
 user=${1// }
 if [[ -z $user ]]
 then
-	user=$(stat . -c %U)
-	trust=false
-else
-	trust=true
+	echo "Wrong params"
+
+	exit 0
 fi
 
 
@@ -57,27 +56,12 @@ crontab -u $user -l
 echo "."
 
 echo "Checking wordpress users"
-if [ "$trust" = true ]
-then
-	sudo -u $user -- /usr/local/bin/php /usr/bin/wp ---path=/home/$user/public_htmll user list 2>/dev/null
-else
-	/usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html user list
-fi
+sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html user list
 echo "."
 
 echo "Checking wordpress checksums"
 echo "* core"
-if [ "$trust" = true ]
-then
-	sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html core verify-checksums 2>/dev/null
-else
-	/usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html core verify-checksums
-fi
+sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html core verify-checksums 
 echo "* plugins"
-if [ "$trust" = true ]
-then
-	sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html plugin verify-checksums --all 2>/dev/null
-else
-	/usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html core verify-checksums
-fi
+sudo -u $user -- /usr/local/bin/php /usr/bin/wp --path=/home/$user/public_html plugin verify-checksums --all 
 echo "."
