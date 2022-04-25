@@ -118,6 +118,14 @@ rm -rf $duserdir/public_html/wp-admin
 rm -rf $duserdir/public_html/wp-includes
 eval "$WP_COMMAND core download --force --skip-content --version=$WPVER"
 
+echo "Reinstalling active plugins"
+WP_ACTIVE_PLUGINS=$(EVAL "$WP_COMMAND plugin list --status=active")
+echo "Archiving plugin directory"
+tar -cf $duserdir/public_html/wp-content/plugins.bad $duserdir/public_html/wp-content/plugins
+eval "$WP_COMMAND plugin delete --all"
+mkdir $duserdir/public_html/wp-content/plugins
+eval "$WP_COMMAND plugin install $WP_ACTIVE_PLUGINS"
+
 
 echo "Now please ensure you change this user's password with root privileges"
 echo "$> passwd $USER"
