@@ -112,6 +112,12 @@ eval "$WP_COMMAND config shuffle-salts"
 echo "."
 echo ""
 
+echo "Reinstalling wp-admin and wp-includes"
+WPVER=$(eval "$WP_COMMAND core version")
+rm -rf $duserdir/public_html/wp-admin
+rm -rf $duserdir/public_html/wp-includes
+eval "$WP_COMMAND core download --force --skip-content --version=$WPVER"
+
 
 echo "Now please ensure you change this user's password with root privileges"
 echo "$> passwd $USER"
