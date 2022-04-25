@@ -56,15 +56,15 @@ do_checks () {
 
 do_wpval () {
 	echo "Checking wordpress user"
-	/usr/local/bin/php /usr/bin/wp --path=/home/$duser/public_html user list
+	eval "$WP_COMMAND user list"
 	echo "."
 	echo ""
 
 	echo "Checking wordpress checksums"
 	echo "* core"
-	/usr/local/bin/php /usr/bin/wp --path=/home/$duser/public_html core verify-checksums 
+	eval "$WP_COMMAND core verify-checksums"
 	echo "* plugins"
-	/usr/local/bin/php /usr/bin/wp --path=/home/$duser/public_html plugin verify-checksums --all 
+	eval "$WP_COMMAND plugin verify-checksums --all"
 	echo "."
 	echo ""
 } 2>&1
@@ -104,7 +104,7 @@ while getopts cfwm:u:-: OPT; do
 		nofiles )       files=false ;;
 		nowpval )       wpval=false ;;
 		w | wpval )     no_tests;wpval=true ;;
-		m | mmin )      mmin="$OPTARG" ;; # number of minutes to look for modified files
+		m | mmin )      needs_arg; mmin="$OPTARG" ;; # number of minutes to look for modified files
 		u | user )      needs_arg; duser="$OPTARG" ;; # number of minutes to look for modified files
 		??* )           die "Illegal option --$OPT" ;;  # bad long option
 		? )             exit 2 ;;  # bad short option (error reported via getopts)
@@ -129,6 +129,7 @@ if [[ -z $mmin ]]; then
 	mmin="-60"
 fi
 
+WP_COMMAND='/usr/local/bin/php /usr/bin/wp --path="/home/$duser/public_html"'
 
 echo "*********************************"
 echo "* Checking $duser"
