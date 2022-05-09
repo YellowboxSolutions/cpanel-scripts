@@ -33,8 +33,8 @@ do_checks () {
 	echo "."
 	echo ""
 
-	echo "Printing ~/etc/shadow"
-	cat /home/$duser/etc/shadow
+	echo "Printing ~/etc shadow files recursively"
+	find /home/$duser/etc -name shadow -type f |xargs cat
 	echo "."
 	echo ""
 
@@ -49,7 +49,7 @@ do_checks () {
 	echo ""
 
 	echo "Showing cronjobs"
-	crontab -u $duser -l
+	crontab -l
 	echo "."
 	echo ""
 } 2>&1
@@ -57,6 +57,9 @@ do_checks () {
 do_wpval () {
 	echo "Checking wordpress user"
 	eval "$WP_COMMAND user list"
+	echo "."
+	echo "Listing wordpress themes"
+	eval "$WP_COMMAND theme list"
 	echo "."
 	echo ""
 
@@ -67,6 +70,7 @@ do_wpval () {
 	eval "$WP_COMMAND plugin verify-checksums --all"
 	echo "."
 	echo ""
+
 } 2>&1
 
 do_files () {
@@ -119,11 +123,6 @@ if [[ -z $duser ]]; then
 	fi
 fi
 
-if [[ -n $mmin ]]; then
-	if ! checks; then
-		die "mmin can only be used when 'checks' are enabled"
-	fi
-fi
 
 if [[ -z $mmin ]]; then
 	mmin="-60"
