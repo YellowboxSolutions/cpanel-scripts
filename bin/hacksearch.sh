@@ -23,7 +23,7 @@ do_checks () {
 	echo ""
 
 	echo "Checking for files modified in the last $mmin  minutes"
-	find /home/$duser/public_html/wp-content -mmin $mmin -ls
+	find /home/$duser/public_html/wp-content -mmin $mmin -ls |grep -v cache
 	find /home/$duser/public_html/wp-includes -mmin $mmin -ls
 	echo "."
 	echo ""
