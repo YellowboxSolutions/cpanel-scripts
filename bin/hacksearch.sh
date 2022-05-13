@@ -73,19 +73,10 @@ do_wpval () {
 
 } 2>&1
 
-do_files () {
-	echo "Getting access-logs"
-	mkdir -p $PWD/access-log-copies >/dev/null 2>&1
-	cp /home/$duser/logs/*.gz $PWD/access-log-copies/
-	cp /home/$duser/access-logs/* $PWD/access-log-copies/
-	echo "."
-	echo ""
-} 2>&1
-
 die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
 needs_arg() { if [ -z "$OPTARG" ]; then die "No arg for --$OPT option"; fi; }
-no_tests() { checks=false;files=false;wpval=false; }
-all_tests() { checks=true;files=true;wpval=true; }
+no_tests() { checks=false;wpval=false; }
+all_tests() { checks=true;wpval=true; }
 
 # Fail if running as root
 if [ "$(id -u)" -eq 0 ]; then
@@ -103,9 +94,7 @@ while getopts cfwm:u:-: OPT; do
 	fi
 	case "$OPT" in
 		c | checks )    no_tests;checks=true ;;
-		f | files )     no_tests;files=true ;;
 		nochecks )      checks=false ;;
-		nofiles )       files=false ;;
 		nowpval )       wpval=false ;;
 		w | wpval )     no_tests;wpval=true ;;
 		m | mmin )      needs_arg; mmin="$OPTARG" ;; # number of minutes to look for modified files
@@ -150,12 +139,3 @@ if $wpval; then
 else
 	echo "skipping"
 fi
-
-echo "  * Doing log copy"
-echo "*********************************"
-if $files; then
-	do_files
-else
-	echo "skipping"
-fi
-
