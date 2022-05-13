@@ -72,15 +72,6 @@ reinstall_wpadmin_wpincludes () {
 	eval "$WP_COMMAND core download --force --skip-content --version=$WPVER"
 }
 
-reinstall_plugins () {
-	echo "Reinstalling active plugins"
-	WP_ACTIVE_PLUGINS=$(eval "$WP_COMMAND plugin list --status=active")
-	echo "Archiving plugin directory"
-	tar -czf $duserdir/public_html/wp-content/plugins.bad.tar.gz $duserdir/public_html/wp-content/plugins
-	eval "$WP_COMMAND plugin delete --all"
-	eval "$WP_COMMAND plugin install $WP_ACTIVE_PLUGINS"
-}
-
 set_wp_file_dir_permissions () {
 	echo "Setting Wordpress file permissions"
 	chmod 600 $duserdir/public_html/wp-config.php
@@ -103,7 +94,7 @@ do_file_removal () {
 	echo "."
 	echo ""
 
-	echo "Remove bad entries from ~/etc/shadow"
+	echo "Remove bad entries from ~/etc/shadow and ~/etc/<domain>/shadow"
 	if [ -f "$duserdir/etc/shadow" ]; then
 		mv -f $duserdir/etc/shadow $duserdir/etc/shadow.old
 		egrep -iv "fox|anonymous|smtp" $duserdir/etc/shadow.old > $duserdir/etc/shadow
@@ -117,7 +108,7 @@ die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
 
 needs_arg() { if [ -z "$OPTARG" ]; then die "No arg for --$OPT option"; fi; }
 
-no_tests() { do_fix_login=false;do_fix_db_password=false;do_fix_salts=false;do_reinstall_wpadmin_wpincludes=false;do_reinstall_plugins=false;do_set_wp_file_dir_permissions=false;do_file_removal=false; }
+no_tests() { do_fix_login=false;do_fix_db_password=false;do_fix_salts=false;do_reinstall_wpadmin_wpincludes=false;do_set_wp_file_dir_permissions=false;do_file_removal=false; }
 
 all_tests() { do_fix_login=true;do_fix_db_password=true;do_fix_salts=true;do_set_wp_file_dir_permissions=true;do_file_removal=true; }
 
